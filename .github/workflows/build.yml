@@ -1,0 +1,32 @@
+name: Build Docker images
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - .github/workflows/build.yml
+      - cowenv
+      - default.conf
+      - Dockerfile
+      - nginx.conf
+  workflow_dispatch:
+
+jobs:
+  build-docker:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: Login to Docker Hub
+        uses: docker/login-action@v1 
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build and push - frxyt/cowenv
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: |
+            frxyt/cowenv
